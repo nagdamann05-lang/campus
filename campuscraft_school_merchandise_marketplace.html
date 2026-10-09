@@ -1,0 +1,1206 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-slate-50">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CampusCraft - Indian School Merchandise Marketplace</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        school: {
+                            50: '#f0f7ff',
+                            100: '#e0effe',
+                            500: '#1d4ed8',
+                            600: '#1e40af',
+                            700: '#1e3a8a',
+                            800: '#172554',
+                        },
+                        gold: {
+                            400: '#fbbf24',
+                            500: '#f59e0b',
+                            600: '#d97706',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Alpine.js CDN -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <style>
+        [x-cloak] { display: none !important; }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body class="h-full flex flex-col font-sans text-slate-800 antialiased bg-slate-50 selection:bg-blue-600 selection:text-white"
+      x-data="schoolStoreApp()"
+      x-init="initApp()">
+
+    <!-- Top Announcement Bar -->
+    <div class="bg-gradient-to-r from-blue-900 via-indigo-900 to-blue-800 text-white text-xs font-medium py-2.5 px-4 text-center flex justify-between items-center shadow-inner">
+        <div class="hidden md:flex items-center gap-2">
+            <span class="bg-amber-400 text-slate-900 text-[10px] font-black px-2 py-0.5 rounded uppercase tracking-wider">OFFICIAL SCHOOL STORE</span>
+            <span>100% Quality Inspected School Merchandise & House Gear!</span>
+        </div>
+        <div class="mx-auto md:mx-0 flex items-center gap-4 text-blue-100">
+            <span><i class="fa-solid fa-award text-amber-300 mr-1"></i> Student ID Verified</span>
+            <span>|</span>
+            <span><i class="fa-solid fa-truck-fast text-emerald-300 mr-1"></i> Free Campus & Canteen Pickup</span>
+            <span class="hidden sm:inline">|</span>
+            <span class="hidden sm:inline font-semibold text-amber-300"><i class="fa-solid fa-indian-rupee-sign mr-1"></i>All Prices in INR (₹)</span>
+        </div>
+    </div>
+
+    <!-- Main Navigation Bar -->
+    <header class="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-sm transition-all">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16 gap-4">
+                
+                <!-- School Store Logo -->
+                <button @click="currentTab = 'shop'" class="flex items-center gap-3 text-left focus:outline-none group">
+                    <div class="w-11 h-11 rounded-xl bg-gradient-to-tr from-blue-700 via-indigo-600 to-amber-500 flex items-center justify-center text-white shadow-md shadow-blue-200 group-hover:scale-105 transition-transform">
+                        <i class="fa-solid fa-graduation-cap text-xl"></i>
+                    </div>
+                    <div>
+                        <span class="text-xl font-black tracking-tight text-slate-900 block leading-none">Campus<span class="text-blue-600">Craft</span></span>
+                        <span class="text-[10px] font-bold text-amber-600 tracking-wider uppercase">School Merchandise Store</span>
+                    </div>
+                </button>
+
+                <!-- Search Input -->
+                <div class="flex-1 max-w-md hidden md:block">
+                    <div class="relative">
+                        <input type="text" 
+                               x-model="searchQuery" 
+                               placeholder="Search t-shirts, hoodies, school bags, bottles, lanyards..." 
+                               class="w-full pl-10 pr-10 py-2 bg-slate-100 border border-slate-200 rounded-xl text-xs sm:text-sm placeholder-slate-400 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 focus:outline-none transition-all">
+                        <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-slate-400 text-xs sm:text-sm"></i>
+                        <button x-show="searchQuery.length > 0" 
+                                @click="searchQuery = ''" 
+                                class="absolute right-3 top-2.5 text-slate-400 hover:text-slate-600 text-xs">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Navigation Controls -->
+                <div class="flex items-center gap-2 sm:gap-3">
+                    
+                    <!-- Catalogue Price List Button -->
+                    <button @click="showPriceListModal = true" 
+                            class="hidden sm:inline-flex items-center gap-1.5 px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl border border-slate-200 transition-all">
+                        <i class="fa-solid fa-list-check text-blue-600"></i>
+                        <span>Price List Catalogue</span>
+                    </button>
+
+                    <!-- Sell Merchandise Button -->
+                    <button @click="openSellModal()" 
+                            class="inline-flex items-center gap-1.5 px-3.5 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-bold text-xs sm:text-sm rounded-xl shadow-sm hover:shadow transition-all transform active:scale-95">
+                        <i class="fa-solid fa-plus-circle"></i>
+                        <span class="hidden sm:inline">Sell School Merch</span>
+                        <span class="sm:hidden">Sell</span>
+                    </button>
+
+                    <!-- Student Seller Dashboard Toggle -->
+                    <button @click="currentTab = currentTab === 'dashboard' ? 'shop' : 'dashboard'" 
+                            :class="currentTab === 'dashboard' ? 'bg-blue-50 text-blue-700 border-blue-200' : 'text-slate-600 hover:bg-slate-100 border-transparent'"
+                            class="p-2 sm:px-3 sm:py-2 rounded-xl text-xs font-semibold border flex items-center gap-2 transition-all">
+                        <i class="fa-solid fa-store text-sm"></i>
+                        <span class="hidden lg:inline">My Student Shop</span>
+                    </button>
+
+                    <!-- Wishlist Trigger -->
+                    <button @click="showWishlistModal = true" 
+                            class="relative p-2.5 text-slate-600 hover:text-blue-600 hover:bg-slate-100 rounded-xl transition-all">
+                        <i class="fa-regular fa-heart text-base sm:text-lg"></i>
+                        <span x-show="wishlist.length > 0" 
+                              x-text="wishlist.length" 
+                              class="absolute -top-1 -right-1 bg-rose-500 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
+                        </span>
+                    </button>
+
+                    <!-- Cart Trigger -->
+                    <button @click="cartOpen = true" 
+                            class="relative p-2.5 text-slate-800 bg-blue-50 border border-blue-100 hover:bg-blue-100 rounded-xl transition-all flex items-center gap-2">
+                        <i class="fa-solid fa-bag-shopping text-base sm:text-lg text-blue-700"></i>
+                        <span class="font-extrabold text-xs sm:text-sm text-slate-900" x-text="'₹' + cartTotal"></span>
+                        <span x-show="cart.length > 0" 
+                              x-text="cartItemCount" 
+                              class="absolute -top-1.5 -right-1.5 bg-blue-700 text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center shadow-sm">
+                        </span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Mobile Search Bar -->
+            <div class="pb-3 md:hidden">
+                <div class="relative">
+                    <input type="text" 
+                           x-model="searchQuery" 
+                           placeholder="Search school bags, t-shirts, bottles..." 
+                           class="w-full pl-9 pr-8 py-2 bg-slate-100 border border-slate-200 rounded-lg text-xs focus:outline-none focus:border-blue-600">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-400 text-xs"></i>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+
+        <!-- SHOP TAB -->
+        <div x-show="currentTab === 'shop'" x-transition:enter="transition ease-out duration-200">
+            
+            <!-- Hero School Merchandise Banner -->
+            <div class="relative bg-gradient-to-r from-blue-950 via-slate-900 to-indigo-950 rounded-3xl overflow-hidden shadow-2xl mb-8 border border-blue-900/50">
+                <div class="absolute inset-0 opacity-20 bg-[radial-gradient(#3b82f6_1px,transparent_1px)] [background-size:16px_16px]"></div>
+                <div class="relative z-10 p-6 sm:p-10 lg:p-12 flex flex-col md:flex-row items-center justify-between gap-8">
+                    <div class="max-w-xl text-center md:text-left">
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-extrabold bg-amber-400/20 text-amber-300 border border-amber-400/30 mb-3">
+                            <i class="fa-solid fa-sparkles text-amber-400"></i> SCHOOL SEASON SPECIAL DISCOUNTS
+                        </span>
+                        <h1 class="text-2xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight leading-tight">
+                            Official Student <span class="bg-gradient-to-r from-amber-300 via-yellow-200 to-amber-400 bg-clip-text text-transparent">School Merchandise</span> Hub
+                        </h1>
+                        <p class="mt-3 text-slate-300 text-xs sm:text-sm leading-relaxed">
+                            Buy & sell high-grade house uniforms, winter hoodies, ergonomic school backpacks, stainless steel bottles, lanyards, and exam stationery sets with verified quality badges.
+                        </p>
+                        
+                        <div class="mt-6 flex flex-wrap items-center justify-center md:justify-start gap-3">
+                            <button @click="scrollToProducts()" 
+                                    class="px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs sm:text-sm rounded-xl shadow-lg shadow-blue-600/30 transition-all hover:-translate-y-0.5">
+                                Explore School Store
+                            </button>
+                            <button @click="showPriceListModal = true" 
+                                    class="px-5 py-2.5 bg-white/10 hover:bg-white/20 text-white font-bold text-xs sm:text-sm rounded-xl border border-white/20 backdrop-blur-sm transition-all">
+                                <i class="fa-solid fa-table-list mr-1.5 text-amber-300"></i> View Price List
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Highlight Highlights Grid -->
+                    <div class="grid grid-cols-2 gap-3 w-full md:w-auto text-center">
+                        <div class="bg-white/10 backdrop-blur-md p-4 rounded-2xl border border-white/10">
+                            <div class="text-2xl font-black text-amber-400">100%</div>
+                            <div class="text-[11px] font-medium text-slate-200 mt-0.5">Quality Guaranteed</div>
+                        </div>
+                        <div class="bg-white/10 backdrop-blur-md p-4 rounded-2xl border border-white/10">
+                            <div class="text-2xl font-black text-emerald-400">Up to 40%</div>
+                            <div class="text-[11px] font-medium text-slate-200 mt-0.5">Student Discounts</div>
+                        </div>
+                        <div class="bg-white/10 backdrop-blur-md p-4 rounded-2xl border border-white/10">
+                            <div class="text-2xl font-black text-blue-300">UPI / Cash</div>
+                            <div class="text-[11px] font-medium text-slate-200 mt-0.5">Easy Payment</div>
+                        </div>
+                        <div class="bg-white/10 backdrop-blur-md p-4 rounded-2xl border border-white/10">
+                            <div class="text-2xl font-black text-indigo-300">₹0 Fee</div>
+                            <div class="text-[11px] font-medium text-slate-200 mt-0.5">For Student Sellers</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Category Filter Bar -->
+            <div id="product-section" class="mb-6 space-y-4">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div>
+                        <h2 class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2">
+                            <span>School Catalogue</span>
+                            <span class="text-xs font-semibold text-blue-700 bg-blue-100 px-2.5 py-0.5 rounded-full" x-text="filteredProducts.length + ' Items'"></span>
+                        </h2>
+                        <p class="text-xs text-slate-500 mt-0.5">Filter by official categories & house gear</p>
+                    </div>
+
+                    <!-- Sorting Options -->
+                    <div class="flex items-center gap-3">
+                        <label class="text-xs font-bold text-slate-500 whitespace-nowrap">Sort By:</label>
+                        <select x-model="sortBy" 
+                                class="bg-white border border-slate-200 text-xs font-semibold rounded-xl px-3 py-2 text-slate-700 focus:ring-2 focus:ring-blue-500 focus:outline-none shadow-sm">
+                            <option value="featured">Featured & Trending</option>
+                            <option value="price-low">Price: Low to High (₹)</option>
+                            <option value="price-high">Price: High to Low (₹)</option>
+                            <option value="discount">Highest Discount (%)</option>
+                            <option value="rating">Top Rated</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Category Pills -->
+                <div class="flex items-center gap-2 overflow-x-auto pb-2 custom-scrollbar">
+                    <template x-for="cat in categories" :key="cat.id">
+                        <button @click="selectedCategory = cat.id"
+                                :class="selectedCategory === cat.id 
+                                    ? 'bg-blue-700 text-white shadow-md shadow-blue-200 font-bold' 
+                                    : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200 font-medium'"
+                                class="px-4 py-2 rounded-xl text-xs whitespace-nowrap transition-all flex items-center gap-2">
+                            <i :class="cat.icon"></i>
+                            <span x-text="cat.name"></span>
+                        </button>
+                    </template>
+                </div>
+            </div>
+
+            <!-- Products Grid -->
+            <div x-show="filteredProducts.length > 0" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                <template x-for="product in filteredProducts" :key="product.id">
+                    <div class="group bg-white rounded-2xl border border-slate-200/80 shadow-sm hover:shadow-xl hover:border-blue-300 transition-all duration-300 flex flex-col overflow-hidden relative">
+                        
+                        <!-- Image Container & Badges -->
+                        <div class="relative aspect-[4/3] sm:aspect-square overflow-hidden bg-slate-100 cursor-pointer" @click="openQuickView(product)">
+                            <img :src="product.image" 
+                                 :alt="product.title" 
+                                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                 @error="$event.target.src='https://placehold.co/600x600/e2e8f0/1e293b?text=School+Merchandise'">
+                            
+                            <!-- Discount Tag Badge -->
+                            <span class="absolute top-3 left-3 bg-rose-600 text-white text-[11px] font-black px-2.5 py-1 rounded-lg uppercase tracking-wider shadow-md">
+                                <span x-text="product.discountTag"></span>
+                            </span>
+
+                            <!-- Quality Certification Badge -->
+                            <span class="absolute top-3 right-3 bg-slate-900/85 backdrop-blur-md text-amber-300 text-[10px] font-extrabold px-2 py-1 rounded-lg flex items-center gap-1 shadow-md">
+                                <i class="fa-solid fa-shield-check text-emerald-400"></i>
+                                <span x-text="product.qualityBadge"></span>
+                            </span>
+
+                            <!-- Wishlist Toggle -->
+                            <button @click.stop="toggleWishlist(product)" 
+                                    :class="isWishlisted(product.id) ? 'bg-rose-50 text-rose-500' : 'bg-white/90 text-slate-600 hover:bg-white'"
+                                    class="absolute bottom-3 right-3 p-2 rounded-full shadow-md backdrop-blur-sm transition-transform active:scale-90">
+                                <i :class="isWishlisted(product.id) ? 'fa-solid fa-heart' : 'fa-regular fa-heart'"></i>
+                            </button>
+                        </div>
+
+                        <!-- Product Information Content -->
+                        <div class="p-4 flex-1 flex flex-col justify-between bg-white">
+                            <div>
+                                <div class="flex items-center justify-between gap-2 text-xs mb-1.5">
+                                    <span class="font-bold text-blue-700 bg-blue-50 px-2.5 py-0.5 rounded-md" x-text="product.categoryName"></span>
+                                    <span class="flex items-center text-amber-500 font-bold text-xs">
+                                        <i class="fa-solid fa-star mr-1"></i>
+                                        <span x-text="product.rating"></span>
+                                    </span>
+                                </div>
+
+                                <h3 @click="openQuickView(product)" 
+                                    class="font-bold text-slate-900 text-sm hover:text-blue-600 cursor-pointer line-clamp-1 transition-colors" 
+                                    x-text="product.title">
+                                </h3>
+                                
+                                <p class="text-xs text-slate-500 mt-1.5 line-clamp-2 leading-relaxed" x-text="product.description"></p>
+                            </div>
+
+                            <!-- Specs & Price Tag Section -->
+                            <div class="mt-4 pt-3 border-t border-slate-100">
+                                <div class="flex items-center justify-between text-[11px] text-slate-500 mb-2">
+                                    <span class="font-semibold text-slate-600" x-text="product.schoolHouse"></span>
+                                    <span class="bg-emerald-50 text-emerald-700 font-bold px-1.5 py-0.5 rounded" x-text="'Stock: ' + product.stock"></span>
+                                </div>
+
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <div class="flex items-baseline gap-1.5">
+                                            <span class="text-lg font-black text-slate-900" x-text="'₹' + product.price"></span>
+                                            <span class="text-xs text-slate-400 line-through" x-text="'₹' + product.originalPrice"></span>
+                                        </div>
+                                        <span class="text-[10px] text-emerald-600 font-bold" x-text="'Save ₹' + (product.originalPrice - product.price)"></span>
+                                    </div>
+
+                                    <button @click="addToCart(product)" 
+                                            class="px-3.5 py-2 bg-blue-700 hover:bg-blue-800 text-white rounded-xl font-bold text-xs flex items-center gap-1.5 transition-colors shadow-sm active:scale-95">
+                                        <i class="fa-solid fa-cart-plus"></i>
+                                        <span>Add</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+            </div>
+
+            <!-- Empty Filter Result -->
+            <div x-show="filteredProducts.length === 0" class="text-center py-16 bg-white rounded-2xl border border-slate-200 my-4">
+                <div class="w-16 h-16 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-3 text-2xl">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                </div>
+                <h3 class="text-lg font-bold text-slate-900">No School Merchandise Found</h3>
+                <p class="text-slate-500 text-xs mt-1 max-w-sm mx-auto">Try resetting filters or searching for t-shirts, school bags, water bottles, or lanyards.</p>
+                <button @click="searchQuery = ''; selectedCategory = 'all'" 
+                        class="mt-4 px-4 py-2 bg-blue-700 text-white text-xs font-bold rounded-xl hover:bg-blue-800 transition-colors">
+                    Reset All Filters
+                </button>
+            </div>
+        </div>
+
+        <!-- STUDENT SELLER DASHBOARD TAB -->
+        <div x-show="currentTab === 'dashboard'" x-transition:enter="transition ease-out duration-200">
+            <div class="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 shadow-sm mb-6">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-slate-100">
+                    <div class="flex items-center gap-4">
+                        <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-blue-700 to-indigo-600 text-white flex items-center justify-center text-2xl font-black shadow-lg shadow-blue-100">
+                            AR
+                        </div>
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <h2 class="text-xl font-black text-slate-900">Aarav Sharma</h2>
+                                <span class="bg-emerald-100 text-emerald-800 text-[10px] font-extrabold px-2.5 py-0.5 rounded-full flex items-center gap-1">
+                                    <i class="fa-solid fa-check-circle"></i> Verified Student Seller
+                                </span>
+                            </div>
+                            <p class="text-xs text-slate-500 mt-1">Class 12-A • Tiger House Captain & Sports Secretary</p>
+                        </div>
+                    </div>
+
+                    <button @click="openSellModal()" 
+                            class="px-5 py-2.5 bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs sm:text-sm rounded-xl shadow transition-colors flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-plus"></i> List New School Merchandise
+                    </button>
+                </div>
+
+                <!-- Seller Earnings Stats in INR -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 my-6">
+                    <div class="p-4 bg-slate-50 rounded-xl border border-slate-100">
+                        <span class="text-xs font-bold text-slate-500 uppercase tracking-wider block">Total Sales</span>
+                        <span class="text-2xl font-black text-slate-900 mt-1 block">₹4,850</span>
+                    </div>
+                    <div class="p-4 bg-slate-50 rounded-xl border border-slate-100">
+                        <span class="text-xs font-bold text-slate-500 uppercase tracking-wider block">Listed Items</span>
+                        <span class="text-2xl font-black text-blue-700 mt-1 block" x-text="myListings.length"></span>
+                    </div>
+                    <div class="p-4 bg-slate-50 rounded-xl border border-slate-100">
+                        <span class="text-xs font-bold text-slate-500 uppercase tracking-wider block">Items Sold</span>
+                        <span class="text-2xl font-black text-emerald-600 mt-1 block">18</span>
+                    </div>
+                    <div class="p-4 bg-slate-50 rounded-xl border border-slate-100">
+                        <span class="text-xs font-bold text-slate-500 uppercase tracking-wider block">Rating</span>
+                        <span class="text-2xl font-black text-amber-500 mt-1 block flex items-center gap-1">
+                            4.9 <i class="fa-solid fa-star text-base"></i>
+                        </span>
+                    </div>
+                </div>
+
+                <!-- My Listings Table -->
+                <div>
+                    <h3 class="font-bold text-slate-900 text-base mb-3">My School Merchandise Listings</h3>
+
+                    <div x-show="myListings.length > 0" class="divide-y divide-slate-100 border border-slate-200 rounded-xl overflow-hidden">
+                        <template x-for="item in myListings" :key="item.id">
+                            <div class="p-4 flex items-center justify-between gap-4 bg-white hover:bg-slate-50 transition-colors">
+                                <div class="flex items-center gap-3">
+                                    <img :src="item.image" class="w-12 h-12 rounded-lg object-cover bg-slate-100">
+                                    <div>
+                                        <h4 class="font-bold text-xs sm:text-sm text-slate-800" x-text="item.title"></h4>
+                                        <div class="flex items-center gap-3 text-xs text-slate-500 mt-0.5">
+                                            <span class="font-bold text-slate-900" x-text="'₹' + item.price"></span>
+                                            <span>•</span>
+                                            <span class="text-blue-700 font-semibold" x-text="item.categoryName"></span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <button @click="removeListing(item.id)" 
+                                        class="p-2 text-rose-600 hover:bg-rose-50 rounded-lg text-xs font-bold transition-colors">
+                                    <i class="fa-solid fa-trash mr-1"></i> Delete
+                                </button>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- PRICE LIST CATALOGUE MODAL -->
+    <div x-show="showPriceListModal" x-cloak class="fixed inset-0 z-50 overflow-y-auto">
+        <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm" @click="showPriceListModal = false"></div>
+        <div class="relative min-h-screen flex items-center justify-center p-4">
+            <div class="relative bg-white rounded-3xl max-w-4xl w-full p-6 sm:p-8 shadow-2xl border border-slate-100 my-8">
+                <div class="flex items-center justify-between pb-4 border-b border-slate-200">
+                    <div>
+                        <h3 class="text-xl font-black text-slate-900 flex items-center gap-2">
+                            <i class="fa-solid fa-table-list text-blue-700"></i> School Merchandise Price List & Catalogue
+                        </h3>
+                        <p class="text-xs text-slate-500 mt-0.5">Complete price list for uniforms, bags, stationery, bottles & ID lanyards</p>
+                    </div>
+                    <button @click="showPriceListModal = false" class="text-slate-400 hover:text-slate-600">
+                        <i class="fa-solid fa-xmark text-xl"></i>
+                    </button>
+                </div>
+
+                <div class="mt-4 overflow-x-auto custom-scrollbar">
+                    <table class="w-full text-left text-xs border-collapse">
+                        <thead>
+                            <tr class="bg-slate-100 text-slate-700 font-bold uppercase tracking-wider border-b border-slate-200">
+                                <th class="p-3 rounded-l-lg">Item</th>
+                                <th class="p-3">Category</th>
+                                <th class="p-3">Quality Spec</th>
+                                <th class="p-3">Discount Rate</th>
+                                <th class="p-3">Original Price</th>
+                                <th class="p-3">Offer Price</th>
+                                <th class="p-3 rounded-r-lg text-right">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100 font-medium">
+                            <template x-for="item in products" :key="item.id">
+                                <tr class="hover:bg-slate-50">
+                                    <td class="p-3 flex items-center gap-2">
+                                        <img :src="item.image" class="w-8 h-8 rounded object-cover">
+                                        <span class="font-bold text-slate-800 line-clamp-1" x-text="item.title"></span>
+                                    </td>
+                                    <td class="p-3 text-blue-700 font-bold" x-text="item.categoryName"></td>
+                                    <td class="p-3 text-slate-600" x-text="item.qualityBadge"></td>
+                                    <td class="p-3">
+                                        <span class="bg-rose-100 text-rose-700 font-extrabold px-2 py-0.5 rounded-md text-[10px]" x-text="item.discountTag"></span>
+                                    </td>
+                                    <td class="p-3 text-slate-400 line-through" x-text="'₹' + item.originalPrice"></td>
+                                    <td class="p-3 text-slate-900 font-black" x-text="'₹' + item.price"></td>
+                                    <td class="p-3 text-right">
+                                        <button @click="addToCart(item)" class="px-2.5 py-1 bg-blue-700 text-white font-bold rounded-lg hover:bg-blue-800">
+                                            + Add
+                                        </button>
+                                    </td>
+                                </tr>
+                            </template>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SELL SCHOOL MERCHANDISE MODAL -->
+    <div x-show="sellModalOpen" x-cloak class="fixed inset-0 z-50 overflow-y-auto">
+        <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm" @click="sellModalOpen = false"></div>
+
+        <div class="relative min-h-screen flex items-center justify-center p-4">
+            <div class="relative bg-white rounded-3xl max-w-xl w-full p-6 sm:p-8 shadow-2xl border border-slate-100 my-8">
+                
+                <div class="flex items-center justify-between pb-4 border-b border-slate-100">
+                    <div class="flex items-center gap-2">
+                        <div class="w-8 h-8 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center font-bold">
+                            <i class="fa-solid fa-tag"></i>
+                        </div>
+                        <h3 class="text-lg sm:text-xl font-extrabold text-slate-900">List Your School Merchandise</h3>
+                    </div>
+                    <button @click="sellModalOpen = false" class="text-slate-400 hover:text-slate-600">
+                        <i class="fa-solid fa-xmark text-lg"></i>
+                    </button>
+                </div>
+
+                <form @submit.prevent="submitListing()" class="mt-4 space-y-3.5">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Item Title *</label>
+                        <input type="text" x-model="newListing.title" required placeholder="e.g. Official Red House Cotton T-Shirt"
+                               class="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm focus:bg-white focus:ring-2 focus:ring-blue-600 focus:outline-none">
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Category *</label>
+                            <select x-model="newListing.category" required class="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm focus:ring-2 focus:ring-blue-600 focus:outline-none">
+                                <option value="tshirts">T-Shirts & House Uniforms</option>
+                                <option value="hoodies">Hoodies & Sweaters</option>
+                                <option value="bags">School Bags & Backpacks</option>
+                                <option value="caps">Caps & Visors</option>
+                                <option value="stationery">Stationery & Exam Sets</option>
+                                <option value="bottles">Water Bottles & Flasks</option>
+                                <option value="idcard">ID Lanyards & Holders</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Price in ₹ (INR) *</label>
+                            <input type="number" min="1" x-model="newListing.price" required placeholder="₹ 399"
+                                   class="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm focus:bg-white focus:ring-2 focus:ring-blue-600 focus:outline-none">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Quality Spec Tag *</label>
+                            <input type="text" x-model="newListing.qualityBadge" placeholder="e.g. 100% Organic Cotton" required
+                                   class="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm focus:bg-white focus:ring-2 focus:ring-blue-600 focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">House / School Tag</label>
+                            <input type="text" x-model="newListing.schoolHouse" placeholder="e.g. Phoenix House / St. Xavier's"
+                                   class="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm focus:bg-white focus:ring-2 focus:ring-blue-600 focus:outline-none">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Select Merchandise Image Preview</label>
+                        <div class="grid grid-cols-4 gap-2">
+                            <template x-for="(img, idx) in presetImages" :key="idx">
+                                <div @click="newListing.image = img" 
+                                     :class="newListing.image === img ? 'ring-2 ring-blue-600 scale-95' : 'opacity-70 hover:opacity-100'"
+                                     class="aspect-square rounded-xl overflow-hidden cursor-pointer border border-slate-200 transition-all">
+                                    <img :src="img" class="w-full h-full object-cover">
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Detailed Item Description</label>
+                        <textarea x-model="newListing.description" rows="2.5" placeholder="Specify fabric, size specs, durability, or school approval..."
+                                  class="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm focus:bg-white focus:ring-2 focus:ring-blue-600 focus:outline-none"></textarea>
+                    </div>
+
+                    <button type="submit" class="w-full py-3 bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs sm:text-sm rounded-xl shadow-lg shadow-blue-200 transition-all">
+                        Publish School Listing to Catalogue
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- QUICK VIEW PRODUCT MODAL -->
+    <div x-show="quickViewModalOpen" x-cloak class="fixed inset-0 z-50 overflow-y-auto">
+        <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm" @click="quickViewModalOpen = false"></div>
+
+        <div class="relative min-h-screen flex items-center justify-center p-4">
+            <div x-show="selectedProduct" class="relative bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl border border-slate-100 overflow-hidden">
+                <button @click="quickViewModalOpen = false" class="absolute top-5 right-5 text-slate-400 hover:text-slate-600 z-10">
+                    <i class="fa-solid fa-xmark text-xl"></i>
+                </button>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <div class="aspect-square rounded-2xl overflow-hidden bg-slate-100 relative border border-slate-100">
+                        <img :src="selectedProduct?.image" class="w-full h-full object-cover">
+                        <span class="absolute top-3 left-3 bg-rose-600 text-white text-[10px] font-black px-2.5 py-1 rounded-md" x-text="selectedProduct?.discountTag"></span>
+                    </div>
+
+                    <div class="flex flex-col justify-between">
+                        <div>
+                            <span class="bg-blue-50 text-blue-700 text-xs font-bold px-2.5 py-0.5 rounded-md" x-text="selectedProduct?.categoryName"></span>
+
+                            <h2 class="text-xl font-black text-slate-900 mt-2" x-text="selectedProduct?.title"></h2>
+
+                            <div class="flex items-center gap-3 mt-2">
+                                <span class="text-2xl font-black text-slate-900" x-text="'₹' + selectedProduct?.price"></span>
+                                <span class="text-xs text-slate-400 line-through" x-text="'₹' + selectedProduct?.originalPrice"></span>
+                                <span class="text-xs bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-md" x-text="selectedProduct?.qualityBadge"></span>
+                            </div>
+
+                            <p class="text-xs text-slate-600 mt-3 leading-relaxed" x-text="selectedProduct?.description"></p>
+
+                            <!-- Verified School Seller Badge -->
+                            <div class="mt-4 p-3 bg-slate-50 rounded-xl border border-slate-100 flex items-center gap-3">
+                                <div class="w-9 h-9 rounded-full bg-blue-700 text-white flex items-center justify-center font-bold text-xs" x-text="selectedProduct?.seller[0]"></div>
+                                <div>
+                                    <div class="flex items-center gap-1.5">
+                                        <span class="text-xs font-bold text-slate-900" x-text="selectedProduct?.seller"></span>
+                                        <i class="fa-solid fa-check-circle text-emerald-500 text-xs"></i>
+                                    </div>
+                                    <span class="text-[10px] text-slate-500" x-text="selectedProduct?.schoolHouse"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-6 pt-4 border-t border-slate-100 flex gap-3">
+                            <button @click="addToCart(selectedProduct); quickViewModalOpen = false" 
+                                    class="flex-1 py-3 bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs sm:text-sm rounded-xl shadow-lg transition-all flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-cart-shopping"></i> Add to Cart
+                            </button>
+                            <button @click="toggleWishlist(selectedProduct)" 
+                                    :class="isWishlisted(selectedProduct?.id) ? 'text-rose-500 bg-rose-50' : 'text-slate-600 bg-slate-100'"
+                                    class="p-3 rounded-xl border border-slate-200">
+                                <i class="fa-solid fa-heart text-base"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SLIDE-OVER SHOPPING CART -->
+    <div x-show="cartOpen" x-cloak class="fixed inset-0 z-50 overflow-hidden">
+        <div class="fixed inset-0 bg-slate-900/50 backdrop-blur-xs" @click="cartOpen = false"></div>
+
+        <div class="fixed inset-y-0 right-0 max-w-full flex pl-10">
+            <div class="w-screen max-w-md bg-white shadow-2xl flex flex-col">
+                
+                <!-- Cart Header -->
+                <div class="p-5 border-b border-slate-100 flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <i class="fa-solid fa-bag-shopping text-blue-700 text-lg"></i>
+                        <h2 class="text-base font-extrabold text-slate-900">Your School Cart</h2>
+                        <span class="bg-blue-100 text-blue-800 text-xs font-bold px-2 py-0.5 rounded-full" x-text="cartItemCount"></span>
+                    </div>
+                    <button @click="cartOpen = false" class="text-slate-400 hover:text-slate-600">
+                        <i class="fa-solid fa-xmark text-lg"></i>
+                    </button>
+                </div>
+
+                <!-- Items Container -->
+                <div class="flex-1 overflow-y-auto p-5 space-y-3 custom-scrollbar">
+                    <template x-for="item in cart" :key="item.id">
+                        <div class="flex gap-3 p-3 bg-slate-50 rounded-xl border border-slate-100">
+                            <img :src="item.image" class="w-14 h-14 rounded-lg object-cover bg-slate-200">
+                            
+                            <div class="flex-1 flex flex-col justify-between">
+                                <div>
+                                    <div class="flex items-center justify-between">
+                                        <h4 class="font-bold text-xs text-slate-900 line-clamp-1" x-text="item.title"></h4>
+                                        <button @click="removeFromCart(item.id)" class="text-slate-400 hover:text-rose-600 text-xs">
+                                            <i class="fa-solid fa-trash"></i>
+                                        </button>
+                                    </div>
+                                    <span class="text-[10px] text-blue-700 font-bold block mt-0.5" x-text="item.qualityBadge"></span>
+                                </div>
+
+                                <div class="flex items-center justify-between mt-2">
+                                    <span class="font-black text-sm text-slate-900" x-text="'₹' + (item.price * item.quantity)"></span>
+                                    
+                                    <div class="flex items-center border border-slate-200 rounded-lg bg-white text-xs">
+                                        <button @click="updateQuantity(item.id, -1)" class="px-2 py-0.5 text-slate-600 hover:bg-slate-100">-</button>
+                                        <span class="px-2 font-bold text-slate-800" x-text="item.quantity"></span>
+                                        <button @click="updateQuantity(item.id, 1)" class="px-2 py-0.5 text-slate-600 hover:bg-slate-100">+</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </template>
+
+                    <div x-show="cart.length === 0" class="text-center py-16">
+                        <i class="fa-solid fa-basket-shopping text-4xl text-slate-300 mb-2"></i>
+                        <p class="font-bold text-slate-700 text-xs">Your cart is empty</p>
+                        <p class="text-[11px] text-slate-400 mt-0.5">Add official school t-shirts, bags or bottles!</p>
+                    </div>
+                </div>
+
+                <!-- Footer Summary -->
+                <div x-show="cart.length > 0" class="p-5 bg-slate-50 border-t border-slate-100 space-y-3">
+                    <div class="flex items-center justify-between text-xs text-slate-600">
+                        <span>Subtotal</span>
+                        <span class="font-bold text-slate-900" x-text="'₹' + cartTotal"></span>
+                    </div>
+                    <div class="flex items-center justify-between text-xs text-slate-600">
+                        <span>Campus Canteen Pickup</span>
+                        <span class="font-bold text-emerald-600">FREE</span>
+                    </div>
+                    <div class="pt-2 border-t border-slate-200 flex items-center justify-between">
+                        <span class="font-extrabold text-sm text-slate-900">Total Payable</span>
+                        <span class="font-black text-lg text-blue-700" x-text="'₹' + cartTotal"></span>
+                    </div>
+
+                    <button @click="cartOpen = false; checkoutModalOpen = true" 
+                            class="w-full py-3 bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs sm:text-sm rounded-xl shadow-lg transition-all flex items-center justify-center gap-2">
+                        <span>Proceed to School Checkout</span>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCHOOL CHECKOUT MODAL -->
+    <div x-show="checkoutModalOpen" x-cloak class="fixed inset-0 z-50 overflow-y-auto">
+        <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm" @click="checkoutModalOpen = false"></div>
+
+        <div class="relative min-h-screen flex items-center justify-center p-4">
+            <div class="relative bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl border border-slate-100">
+                
+                <div class="flex items-center justify-between pb-4 border-b border-slate-100">
+                    <h3 class="text-lg font-black text-slate-900">School Checkout & Pickup</h3>
+                    <button @click="checkoutModalOpen = false" class="text-slate-400 hover:text-slate-600">
+                        <i class="fa-solid fa-xmark text-lg"></i>
+                    </button>
+                </div>
+
+                <div x-show="!orderSuccess" class="mt-4 space-y-3.5">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Campus Pickup Point *</label>
+                        <select x-model="checkout.pickupLocation" class="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm focus:ring-2 focus:ring-blue-600 focus:outline-none">
+                            <option value="Main Canteen Counter">Main School Canteen Counter</option>
+                            <option value="Sports House Room">Sports House Room / Pavilion</option>
+                            <option value="Library Desk">Library Information Desk</option>
+                        </select>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Student Roll / Admission No *</label>
+                            <input type="text" x-model="checkout.studentId" placeholder="e.g. ADM-2026-89" required class="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Payment Method</label>
+                            <select x-model="checkout.paymentMethod" class="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm">
+                                <option value="UPI / GooglePay / Paytm">UPI / GPay / Paytm</option>
+                                <option value="Cash on Pickup">Cash on Pickup</option>
+                                <option value="School Card Balance">School Student Card</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="p-3 bg-blue-50 rounded-xl border border-blue-100 text-xs text-blue-900 space-y-1">
+                        <div class="font-bold flex items-center gap-1.5">
+                            <i class="fa-solid fa-shield-halved text-blue-700"></i> Student Quality Guarantee
+                        </div>
+                        <p class="text-[11px] text-blue-800">You can inspect fabric size & quality at the canteen before collecting your items.</p>
+                    </div>
+
+                    <button @click="processOrder()" 
+                            class="w-full py-3 bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs sm:text-sm rounded-xl shadow-lg transition-all flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-lock text-xs"></i>
+                        <span x-text="'Confirm & Pay ₹' + cartTotal"></span>
+                    </button>
+                </div>
+
+                <!-- Order Success State -->
+                <div x-show="orderSuccess" class="py-6 text-center space-y-4">
+                    <div class="w-14 h-14 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto text-2xl">
+                        <i class="fa-solid fa-check"></i>
+                    </div>
+                    <h3 class="text-xl font-black text-slate-900">Order Placed Successfully!</h3>
+                    <p class="text-xs text-slate-500 max-w-xs mx-auto">Show this pickup QR code at the School Canteen counter along with your Student ID.</p>
+
+                    <div class="p-4 bg-slate-100 rounded-2xl inline-block border border-slate-200 my-2">
+                        <i class="fa-solid fa-qrcode text-7xl text-slate-800"></i>
+                        <span class="block text-[10px] font-mono font-bold text-slate-600 mt-2">SCH-8921-INR</span>
+                    </div>
+
+                    <div>
+                        <button @click="finishOrder()" class="px-5 py-2 bg-slate-900 text-white text-xs font-bold rounded-xl hover:bg-slate-800 transition-colors">
+                            Return to School Store
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- WISHLIST MODAL -->
+    <div x-show="showWishlistModal" x-cloak class="fixed inset-0 z-50 overflow-y-auto">
+        <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm" @click="showWishlistModal = false"></div>
+        <div class="relative min-h-screen flex items-center justify-center p-4">
+            <div class="relative bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-100">
+                <div class="flex items-center justify-between pb-4 border-b border-slate-100">
+                    <h3 class="text-base font-bold text-slate-900 flex items-center gap-2">
+                        <i class="fa-solid fa-heart text-rose-500"></i> Saved Merchandise
+                    </h3>
+                    <button @click="showWishlistModal = false" class="text-slate-400 hover:text-slate-600">
+                        <i class="fa-solid fa-xmark text-lg"></i>
+                    </button>
+                </div>
+
+                <div class="py-4 space-y-3 max-h-80 overflow-y-auto custom-scrollbar">
+                    <template x-for="item in wishlist" :key="item.id">
+                        <div class="flex items-center justify-between p-3 bg-slate-50 rounded-xl">
+                            <div class="flex items-center gap-3">
+                                <img :src="item.image" class="w-10 h-10 rounded-lg object-cover">
+                                <div>
+                                    <h4 class="font-bold text-xs text-slate-800" x-text="item.title"></h4>
+                                    <span class="text-xs text-blue-700 font-black" x-text="'₹' + item.price"></span>
+                                </div>
+                            </div>
+                            <button @click="addToCart(item)" class="px-2.5 py-1 bg-blue-700 text-white text-[11px] font-bold rounded-lg">Add to Cart</button>
+                        </div>
+                    </template>
+                    <div x-show="wishlist.length === 0" class="text-center py-8 text-xs text-slate-400">
+                        No saved items yet. Tap the heart icon on any school product!
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST NOTIFICATION -->
+    <div x-show="toast.show" 
+         x-cloak 
+         x-transition:enter="transition ease-out duration-300 transform"
+         x-transition:enter-start="translate-y-8 opacity-0"
+         x-transition:enter-end="translate-y-0 opacity-100"
+         x-transition:leave="transition ease-in duration-200 transform"
+         x-transition:leave-start="translate-y-0 opacity-100"
+         x-transition:leave-end="translate-y-8 opacity-0"
+         class="fixed bottom-6 right-6 z-50 bg-slate-900 text-white px-4 py-3 rounded-2xl shadow-2xl flex items-center gap-3 border border-slate-700">
+        <div class="w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-xs">
+            <i class="fa-solid fa-check"></i>
+        </div>
+        <span class="text-xs font-semibold" x-text="toast.message"></span>
+    </div>
+
+    <!-- Application State & Interactive Logic -->
+    <script>
+        function schoolStoreApp() {
+            return {
+                currentTab: 'shop',
+                searchQuery: '',
+                selectedCategory: 'all',
+                sortBy: 'featured',
+                cartOpen: false,
+                sellModalOpen: false,
+                quickViewModalOpen: false,
+                checkoutModalOpen: false,
+                showWishlistModal: false,
+                showPriceListModal: false,
+                orderSuccess: false,
+                selectedProduct: null,
+
+                toast: {
+                    show: false,
+                    message: ''
+                },
+
+                checkout: {
+                    pickupLocation: 'Main Canteen Counter',
+                    studentId: '',
+                    paymentMethod: 'UPI / GooglePay / Paytm'
+                },
+
+                // Categories exclusively for school merchandise
+                categories: [
+                    { id: 'all', name: 'All School Gear', icon: 'fa-solid fa-border-all' },
+                    { id: 'tshirts', name: 'T-Shirts & House Uniforms', icon: 'fa-solid fa-shirt' },
+                    { id: 'hoodies', name: 'Hoodies & Sweaters', icon: 'fa-solid fa-user-ninja' },
+                    { id: 'bags', name: 'School Bags & Backpacks', icon: 'fa-solid fa-briefcase' },
+                    { id: 'caps', name: 'Caps & Visors', icon: 'fa-solid fa-graduation-cap' },
+                    { id: 'stationery', name: 'Stationery Sets', icon: 'fa-solid fa-pen-ruler' },
+                    { id: 'bottles', name: 'Water Bottles', icon: 'fa-solid fa-bottle-water' },
+                    { id: 'idcard', name: 'ID Card Lanyards', icon: 'fa-solid fa-id-badge' }
+                ],
+
+                presetImages: [
+                    'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=600&q=80',
+                    'https://images.unsplash.com/photo-1556905055-8f358a7a47b2?auto=format&fit=crop&w=600&q=80',
+                    'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=600&q=80',
+                    'https://images.unsplash.com/photo-1602143407151-7111542de6e8?auto=format&fit=crop&w=600&q=80'
+                ],
+
+                // School Merchandise Items (All prices in Indian Rupees ₹)
+                products: [
+                    {
+                        id: 1,
+                        title: "Official House Athletic T-Shirt (Cotton)",
+                        category: "tshirts",
+                        categoryName: "T-Shirts",
+                        price: 399,
+                        originalPrice: 599,
+                        discountTag: "33% OFF",
+                        qualityBadge: "100% Breathable Cotton",
+                        rating: 4.9,
+                        stock: 24,
+                        schoolHouse: "Red & Blue House Editions",
+                        seller: "Sports Council",
+                        image: "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=600&q=80",
+                        description: "Official school house t-shirt crafted from combed cotton, perfect for sports days, drill exercises, and house competitions."
+                    },
+                    {
+                        id: 2,
+                        title: "Heavyweight Winter School Hoodie",
+                        category: "hoodies",
+                        categoryName: "Hoodies",
+                        price: 899,
+                        originalPrice: 1299,
+                        discountTag: "30% OFF",
+                        qualityBadge: "380 GSM Warm Fleece",
+                        rating: 5.0,
+                        stock: 15,
+                        schoolHouse: "Senior Class Special",
+                        seller: "Aarav S. (Head Boy)",
+                        image: "https://images.unsplash.com/photo-1556905055-8f358a7a47b2?auto=format&fit=crop&w=600&q=80",
+                        description: "Warm fleece winter hoodie with school emblem embroidery, ribbed cuffs, and pouch pockets for cold morning assemblies."
+                    },
+                    {
+                        id: 3,
+                        title: "Ergonomic Waterproof School Backpack",
+                        category: "bags",
+                        categoryName: "School Bags",
+                        price: 999,
+                        originalPrice: 1499,
+                        discountTag: "33% OFF",
+                        qualityBadge: "Waterproof Nylon & Ortho Back",
+                        rating: 4.8,
+                        stock: 18,
+                        schoolHouse: "All Classes",
+                        seller: "Student Welfare Store",
+                        image: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=600&q=80",
+                        description: "Heavy-duty 30L school bag with padded laptop compartment, bottle side sleeves, and cushioned ergonomic back support."
+                    },
+                    {
+                        id: 4,
+                        title: "Insulated Stainless Steel Water Bottle (750ml)",
+                        category: "bottles",
+                        categoryName: "Water Bottles",
+                        price: 499,
+                        originalPrice: 799,
+                        discountTag: "37% OFF",
+                        qualityBadge: "BPA-Free 24hr Cold Steel",
+                        rating: 4.9,
+                        stock: 30,
+                        schoolHouse: "Eco-Club Approved",
+                        seller: "Green Club",
+                        image: "https://images.unsplash.com/photo-1602143407151-7111542de6e8?auto=format&fit=crop&w=600&q=80",
+                        description: "Grade 304 stainless steel double-walled flask that keeps water cold for 24 hours. Leakproof lid with engraved school mascot."
+                    },
+                    {
+                        id: 5,
+                        title: "Embroidered School Sports House Cap",
+                        category: "caps",
+                        categoryName: "Caps",
+                        price: 249,
+                        originalPrice: 399,
+                        discountTag: "37% OFF",
+                        qualityBadge: "UV Protect Cotton Twill",
+                        rating: 4.7,
+                        stock: 40,
+                        schoolHouse: "Yellow, Green, Blue, Red",
+                        seller: "Sports Captain",
+                        image: "https://images.unsplash.com/photo-1588850561407-ed78c282e89b?auto=format&fit=crop&w=600&q=80",
+                        description: "Adjustable 6-panel cotton cap with sun protection visor and high-density house emblem stitch."
+                    },
+                    {
+                        id: 6,
+                        title: "Complete Exam Stationery & Geometry Set",
+                        category: "stationery",
+                        categoryName: "Stationery",
+                        price: 299,
+                        originalPrice: 450,
+                        discountTag: "33% OFF",
+                        qualityBadge: "Non-Toxic & Shatterproof",
+                        rating: 4.8,
+                        stock: 50,
+                        schoolHouse: "Exam Essential",
+                        seller: "Science Club",
+                        image: "https://images.unsplash.com/photo-1583485088034-697b5bc54ccd?auto=format&fit=crop&w=600&q=80",
+                        description: "Includes transparent exam pouch, 10 smooth gel pens, metallic geometry box, scale, eraser, and HB pencils."
+                    },
+                    {
+                        id: 7,
+                        title: "Custom School ID Card Lanyard & Badge Holder",
+                        category: "idcard",
+                        categoryName: "ID Lanyards",
+                        price: 149,
+                        originalPrice: 249,
+                        discountTag: "40% OFF",
+                        qualityBadge: "Heavy Duty Metal Clip",
+                        rating: 4.9,
+                        stock: 100,
+                        schoolHouse: "Official Crest",
+                        seller: "Student Prefect Team",
+                        image: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=600&q=80",
+                        description: "Satin finish woven school lanyard with quick-release breakaway safety buckle and clear rigid PVC ID card holder."
+                    },
+                    {
+                        id: 8,
+                        title: "School Spirit Knitted Winter Sweater",
+                        category: "hoodies",
+                        categoryName: "Hoodies",
+                        price: 749,
+                        originalPrice: 1099,
+                        discountTag: "31% OFF",
+                        qualityBadge: "Soft Anti-Pilling Wool",
+                        rating: 4.6,
+                        stock: 12,
+                        schoolHouse: "Winter Uniform",
+                        seller: "Priya V.",
+                        image: "https://images.unsplash.com/photo-1578587018452-892bacefd3f2?auto=format&fit=crop&w=600&q=80",
+                        description: "Classic V-neck school knitted pullover sweater made with soft wool blend for cozy classroom comfort."
+                    }
+                ],
+
+                myListings: [],
+                cart: [],
+                wishlist: [],
+
+                newListing: {
+                    title: '',
+                    category: 'tshirts',
+                    price: '',
+                    qualityBadge: '100% Quality Fabric',
+                    schoolHouse: '',
+                    image: 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=600&q=80',
+                    description: ''
+                },
+
+                initApp() {
+                    this.myListings = [
+                        {
+                            id: 101,
+                            title: "Official Yellow House Sports Tee",
+                            category: "tshirts",
+                            categoryName: "T-Shirts",
+                            price: 350,
+                            image: "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=600&q=80"
+                        }
+                    ];
+                },
+
+                get filteredProducts() {
+                    return this.products
+                        .filter(p => {
+                            const matchesCategory = this.selectedCategory === 'all' || p.category === this.selectedCategory;
+                            const matchesSearch = p.title.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
+                                                  p.description.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
+                                                  p.schoolHouse.toLowerCase().includes(this.searchQuery.toLowerCase());
+                            return matchesCategory && matchesSearch;
+                        })
+                        .sort((a, b) => {
+                            if (this.sortBy === 'price-low') return a.price - b.price;
+                            if (this.sortBy === 'price-high') return b.price - a.price;
+                            if (this.sortBy === 'discount') return (b.originalPrice - b.price) - (a.originalPrice - a.price);
+                            if (this.sortBy === 'rating') return b.rating - a.rating;
+                            return b.id - a.id;
+                        });
+                },
+
+                get cartTotal() {
+                    return this.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+                },
+
+                get cartItemCount() {
+                    return this.cart.reduce((sum, item) => sum + item.quantity, 0);
+                },
+
+                addToCart(product) {
+                    const existing = this.cart.find(item => item.id === product.id);
+                    if (existing) {
+                        existing.quantity++;
+                    } else {
+                        this.cart.push({ ...product, quantity: 1 });
+                    }
+                    this.showToast(`Added "${product.title}" to cart!`);
+                },
+
+                removeFromCart(productId) {
+                    this.cart = this.cart.filter(item => item.id !== productId);
+                },
+
+                updateQuantity(productId, delta) {
+                    const item = this.cart.find(i => i.id === productId);
+                    if (item) {
+                        item.quantity += delta;
+                        if (item.quantity <= 0) {
+                            this.removeFromCart(productId);
+                        }
+                    }
+                },
+
+                toggleWishlist(product) {
+                    const idx = this.wishlist.findIndex(i => i.id === product.id);
+                    if (idx >= 0) {
+                        this.wishlist.splice(idx, 1);
+                        this.showToast('Removed from saved items');
+                    } else {
+                        this.wishlist.push(product);
+                        this.showToast('Added to saved items!');
+                    }
+                },
+
+                isWishlisted(productId) {
+                    return this.wishlist.some(i => i.id === productId);
+                },
+
+                openQuickView(product) {
+                    this.selectedProduct = product;
+                    this.quickViewModalOpen = true;
+                },
+
+                openSellModal() {
+                    this.sellModalOpen = true;
+                },
+
+                submitListing() {
+                    const catObj = this.categories.find(c => c.id === this.newListing.category);
+                    const originalP = Math.round(parseFloat(this.newListing.price) * 1.3);
+                    const item = {
+                        id: Date.now(),
+                        title: this.newListing.title,
+                        category: this.newListing.category,
+                        categoryName: catObj ? catObj.name : 'School Gear',
+                        price: parseFloat(this.newListing.price),
+                        originalPrice: originalP,
+                        discountTag: "23% OFF",
+                        qualityBadge: this.newListing.qualityBadge || 'Quality Checked',
+                        rating: 5.0,
+                        stock: 10,
+                        schoolHouse: this.newListing.schoolHouse || 'Student Seller Item',
+                        seller: 'Aarav S. (You)',
+                        image: this.newListing.image,
+                        description: this.newListing.description || 'Verified student listed school merchandise item.'
+                    };
+
+                    this.products.unshift(item);
+                    this.myListings.unshift(item);
+
+                    this.sellModalOpen = false;
+                    this.showToast('School Merchandise listed successfully!');
+
+                    this.newListing = {
+                        title: '',
+                        category: 'tshirts',
+                        price: '',
+                        qualityBadge: '100% Quality Fabric',
+                        schoolHouse: '',
+                        image: 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=600&q=80',
+                        description: ''
+                    };
+                },
+
+                removeListing(itemId) {
+                    this.myListings = this.myListings.filter(i => i.id !== itemId);
+                    this.products = this.products.filter(i => i.id !== itemId);
+                    this.showToast('Listing removed from catalogue');
+                },
+
+                processOrder() {
+                    if (!this.checkout.studentId) {
+                        this.showToast('Please enter your Student Roll / Admission No.');
+                        return;
+                    }
+                    this.orderSuccess = true;
+                },
+
+                finishOrder() {
+                    this.cart = [];
+                    this.orderSuccess = false;
+                    this.checkoutModalOpen = false;
+                    this.showToast('Order confirmed! Collect at Canteen counter.');
+                },
+
+                showToast(msg) {
+                    this.toast.message = msg;
+                    this.toast.show = true;
+                    setTimeout(() => {
+                        this.toast.show = false;
+                    }, 3000);
+                },
+
+                scrollToProducts() {
+                    const el = document.getElementById('product-section');
+                    if (el) el.scrollIntoView({ behavior: 'smooth' });
+                }
+            }
+        }
+    </script>
+</body>
+</html>
